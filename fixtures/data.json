@@ -1,0 +1,178 @@
+{
+  "plans": [
+    {
+      "plan_id": "balanced",
+      "classes": 12,
+      "class_size": 18,
+      "rounds": 2,
+      "sessions": 8,
+      "class_allocation": [
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B"
+      ],
+      "student_levels": 2
+    },
+    {
+      "plan_id": "compact",
+      "classes": 6,
+      "class_size": 30,
+      "rounds": 2,
+      "sessions": 4,
+      "class_allocation": [
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B"
+      ],
+      "student_levels": 2
+    },
+    {
+      "plan_id": "staggered",
+      "classes": 10,
+      "class_size": 20,
+      "rounds": 3,
+      "sessions": 12,
+      "class_allocation": [
+        "A",
+        "A",
+        "A",
+        "A",
+        "A",
+        "B",
+        "B",
+        "B",
+        "B",
+        "B"
+      ],
+      "student_levels": 2
+    }
+  ],
+  "slots": [
+    {
+      "slot_id": "slot_0",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_1",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_2",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_3",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_4",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_5",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_6",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_7",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_8",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    },
+    {
+      "slot_id": "slot_9",
+      "seats": 30,
+      "rooms": 2,
+      "cost": 900
+    }
+  ],
+  "budget": 18000,
+  "per_student_cost": 24,
+  "factors": [
+    {
+      "name": "teaching",
+      "unit": "class",
+      "levels": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "name": "practice",
+      "unit": "student",
+      "levels": [
+        "low",
+        "high"
+      ]
+    }
+  ],
+  "estimands": [
+    "teaching",
+    "practice",
+    "teaching:practice"
+  ],
+  "historical": {
+    "variance_ranges": {
+      "class": [
+        2,
+        8
+      ],
+      "student": [
+        10,
+        25
+      ],
+      "residual": [
+        10,
+        20
+      ]
+    },
+    "absence_ranges": [
+      0.05,
+      0.22
+    ],
+    "repeat_correlation": [
+      0.25,
+      0.7
+    ]
+  },
+  "minimum_differences": {
+    "teaching": 3,
+    "practice": 2,
+    "teaching:practice": 2
+  }
+}

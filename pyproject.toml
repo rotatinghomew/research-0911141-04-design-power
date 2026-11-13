@@ -1,0 +1,6 @@
+[project]
+name = "design-power"
+version = "0.3.0"
+description = "教学试验排期试算台"
+requires-python = ">=3.11"
+dependencies = []

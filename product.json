@@ -1,0 +1,19 @@
+{
+  "name": "教学试验排期试算台",
+  "focus": "现有方案的资源占用",
+  "options": [
+    [
+      "plan",
+      "排期方案",
+      [
+        "balanced",
+        "compact",
+        "staggered"
+      ]
+    ]
+  ],
+  "selection": {
+    "plan": "balanced"
+  },
+  "purpose": "本地研究资料浏览与复核记录"
+}
