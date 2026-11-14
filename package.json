@@ -1,0 +1,9 @@
+{
+  "name": "design-power",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m design_power",
+    "test:browser": "python3 tests/browser_smoke.py"
+  }
+}
