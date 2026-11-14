@@ -69,5 +69,94 @@ class BrowserWorkflow(unittest.TestCase):
                 thread.join(timeout=5)
 
 
+class BrowserDesignWorkflow(unittest.TestCase):
+    def test_design_assessment_compare_and_archive(self):
+        import importlib.util
+        project = json.loads((ROOT / 'package.json').read_text())
+        module_name = project['scripts']['start'].split()[2]
+        server_module = importlib.import_module(module_name + '.server')
+        with tempfile.TemporaryDirectory() as state:
+            server = server_module.make_server(ROOT, state, port=0)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                with sync_playwright() as playwright:
+                    browser = playwright.chromium.launch(headless=True)
+                    try:
+                        page = browser.new_page(viewport={'width': 1360, 'height': 900})
+                        errors = []
+                        page.on('pageerror', lambda error: errors.append(str(error)))
+                        page.goto(f'http://127.0.0.1:{server.server_port}', wait_until='networkidle')
+                        page.locator('#status').filter(has_text='已更新描述').wait_for()
+                        page.locator('#mode').select_option('design')
+                        page.locator('#design-controls').wait_for(state='visible')
+                        with page.expect_response('**/api/explore') as response:
+                            page.locator('#assess').click()
+                        self.assertEqual(response.value.status, 200)
+                        page.locator('#status').filter(has_text='设计评估完成').wait_for()
+                        self.assertTrue(page.locator('#design-view').is_visible())
+                        self.assertGreater(page.locator('#power-rows tr').count(), 0)
+                        self.assertGreater(page.locator('#random-rows tr').count(), 0)
+                        self.assertGreater(page.locator('#schedule-rows tr').count(), 0)
+                        # 资源超限与统计能力不足必须分别出现，不能合并
+                        self.assertGreater(page.locator('#feasibility .problem').count(), 0)
+                        layers = page.locator('#verdict .layers article').all_inner_texts()
+                        self.assertTrue(any('资源' in text for text in layers))
+                        # 调整成一个装得下的方案：班级数、班额、时段
+                        page.locator('#override-classes').fill('10')
+                        page.locator('#override-class_size').fill('14')
+                        page.locator('#override-arm-a').fill('5')
+                        page.locator('#override-arm-b').fill('5')
+                        with page.expect_response('**/api/explore') as response:
+                            page.locator('#assess').click()
+                        self.assertEqual(response.value.status, 200)
+                        self.assertIn('通过', page.locator('#verdict .layers article').first.inner_text())
+                        recipe = json.loads(page.locator('#recipe').inner_text())
+                        self.assertIn('sha256', recipe['recipe'])
+                        self.assertEqual(recipe['candidate']['overrides']['classes'], 10)
+                        # 同一种子复算应得到同一指纹
+                        page.locator('#rerun-replications').fill('120')
+                        page.locator('#rerun-seed').fill('20260914')
+                        with page.expect_response('**/api/explore') as response:
+                            page.locator('#rerun').click()
+                        self.assertEqual(response.value.status, 200)
+                        page.locator('#status').filter(has_text='已按指定种子复算').wait_for()
+                        first = json.loads(page.locator('#recipe').inner_text())['recipe']['sha256']
+                        page.locator('#rerun').click()
+                        page.wait_for_function("value => JSON.parse(document.querySelector('#recipe').textContent).recipe.sha256 === value", arg=first)
+                        page.wait_for_function("value => document.querySelector('#rerun-result').textContent.includes(value)", arg=first[:12])
+                        # 保存后改变范围再读回，必须逐字一致
+                        page.locator('#title').fill('设计复核 β')
+                        page.locator('#save').click()
+                        page.locator('#status').filter(has_text='已保存记录').wait_for()
+                        saved = json.loads(page.locator('#details').inner_text())
+                        page.locator('#override-classes').fill('12')
+                        page.locator('#override-arm-a').fill('')
+                        page.locator('#override-arm-b').fill('')
+                        with page.expect_response('**/api/explore') as response:
+                            page.locator('#assess').click()
+                        self.assertEqual(response.value.status, 200)
+                        page.locator('#archive button').first.click()
+                        page.locator('#status').filter(has_text='已读取保存的设计评估').wait_for()
+                        reopened = json.loads(page.locator('#details').inner_text())
+                        self.assertEqual(saved, reopened)
+                        with page.expect_response('**/api/compare') as response:
+                            page.locator('#compare').click()
+                        self.assertEqual(response.value.status, 200)
+                        page.locator('#status').filter(has_text='已复算').wait_for()
+                        self.assertTrue(page.locator('#compare-view').is_visible())
+                        self.assertGreaterEqual(page.locator('#compare-rows tr').count(), 3)
+                        page.locator('#save-compare').click()
+                        page.locator('#status').filter(has_text='已保存比较记录').wait_for()
+                        page.locator('#compare-save-result').filter(has_text='已保存比较记录').wait_for()
+                        self.assertEqual(errors, [])
+                    finally:
+                        browser.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=5)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -1,13 +1,44 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>教学试验排期试算台</title><link rel="stylesheet" href="/style.css"></head>
-<body><header><span>教研数据 · 复核工作区</span><h1>教学试验排期试算台</h1><p>现有方案的资源占用</p></header>
+<body><header><span>教研数据 · 复核工作区</span><h1>教学试验排期试算台</h1><p>资源账、设计识别与统计能力</p></header>
 <main><aside><h2>数据与范围</h2><label>数据版本<select id="revision"></select></label><div id="controls"></div>
-<button id="inspect">查看所选范围</button><label>导入完整数据<input id="upload" type="file" accept=".json,application/json"></label>
-<button id="raw">查看原始记录</button><h2>分析记录</h2><label>记录名称<input id="title" value="本次复核"></label>
+<button id="inspect">查看所选范围</button>
+<label>导入完整数据<input id="upload" type="file" accept=".json,application/json"></label>
+<button id="raw">查看原始记录</button><h2>设计调整</h2><div id="design-controls"></div>
+<button id="assess">评估当前方案</button>
+<button id="compare">复算并比较全部方案</button>
+<h2>分析记录</h2><label>记录名称<input id="title" value="本次复核"></label>
 <button id="save">保存当前描述</button><div id="archive"></div></aside>
-<section><div id="status" role="status">正在读取本地数据…</div><div id="summary"></div>
-<h2>现有方案的资源占用</h2><div id="notes"></div><canvas id="chart" width="960" height="300" aria-label="所选范围描述图"></canvas>
+<section><div id="status" role="status">正在读取本地数据…</div>
+<div id="ledger"><div id="summary"></div>
+<h2 id="ledger-heading">现有方案的资源占用</h2><div id="notes"></div>
+<canvas id="chart" width="960" height="300" aria-label="所选范围描述图"></canvas>
 <div class="table-wrap"><table><thead id="columns"></thead><tbody id="rows"></tbody></table></div>
+</div>
+<section id="design-view" hidden>
+<div id="design-summary"></div><div id="design-notes"></div>
+<h2>三层结论（分开呈现）</h2><div id="verdict"></div>
+<div id="feasibility"></div>
+<h2>随机化发生在哪一层</h2><div class="table-wrap"><table><thead id="random-head"></thead><tbody id="random-rows"></tbody></table></div>
+<h2>关注差异的检出能力</h2><div class="table-wrap"><table><thead id="power-head"></thead><tbody id="power-rows"></tbody></table></div>
+<div id="scenario-notes"></div>
+<h2>与排期表核对</h2><div id="schedule-summary"></div>
+<div class="table-wrap"><table><thead id="schedule-head"></thead><tbody id="schedule-rows"></tbody></table></div>
+<h2>种子与复算说明</h2>
+<div id="rerun-panel"><p class="hint">相同输入应得到相同结果。填写下面的种子与重复次数后重新评估，可自行核对指纹；保存记录后也可用 <code>/api/notebooks/编号/verify</code> 重算。</p>
+<div class="rerun"><label>重复次数<input id="rerun-replications" type="number" min="40" max="4000" value="240"></label>
+<label>随机种子<input id="rerun-seed" type="number" min="0" value="20260914"></label>
+<button id="rerun">用这些设置复算</button><span id="rerun-result" role="status"></span></div>
+</div>
+<pre id="recipe"></pre>
+</section>
+<section id="compare-view" hidden>
+<h2>方案比较（不排序、不推荐）</h2><div id="compare-notes"></div>
+<div class="rerun"><label>比较记录名称<input id="compare-title" value="方案比较复核"></label>
+<button id="save-compare">保存这次比较</button><span id="compare-save-result" role="status"></span></div>
+<div class="table-wrap"><table><thead id="compare-head"></thead><tbody id="compare-rows"></tbody></table></div>
+<div id="compare-details"></div>
+</section>
 <h2 id="detail-heading">记录与依据</h2><pre id="details">点击记录行可查看详细字段。</pre><button id="export">导出当前记录</button>
 </section></main><footer>仅使用本地虚构记录；描述统计不替代研究设计与业务复核。</footer><script src="/app.js"></script></body></html>

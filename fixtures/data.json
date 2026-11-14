@@ -159,6 +159,10 @@
       "residual": [
         10,
         20
+      ],
+      "period": [
+        0.5,
+        3
       ]
     },
     "absence_ranges": [

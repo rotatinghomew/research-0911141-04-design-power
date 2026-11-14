@@ -40,6 +40,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(200, self.workbench.store.dataset(revision))
             if parsed.path == "/api/notebooks":
                 return self.send(200, self.workbench.store.notebooks())
+            if parsed.path.startswith("/api/notebooks/") and parsed.path.endswith("/verify"):
+                identifier = parsed.path.split("/")[-2]
+                return self.send(200, self.workbench.verify(identifier))
             if parsed.path.startswith("/api/notebooks/"):
                 identifier = parsed.path.rsplit("/", 1)[-1]
                 return self.send(200, self.workbench.store.notebook(identifier))
@@ -61,6 +64,10 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("请求正文应为对象")
             if self.path == "/api/explore":
                 return self.send(200, self.workbench.inspect(body))
+            if self.path == "/api/compare":
+                return self.send(200, self.workbench.compare(body))
+            if self.path == "/api/notebooks/compare":
+                return self.send(201, self.workbench.save_comparison(body))
             if self.path == "/api/datasets":
                 return self.send(201, self.workbench.upload(body))
             if self.path == "/api/notebooks":
